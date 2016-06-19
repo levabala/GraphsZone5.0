@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+ <head>
+   <title>GraphsZone5.0</title>
+   <meta charset="utf-8">
+   <link rel="stylesheet" type="text/css" href="style.css">   
+   <script src="http://code.jquery.com/jquery-latest.min.js"></script>   
+   <!--Connecting external scripts-->   
+   <script src='../Additional/Interact.js'></script>
+   <script src='../Additional/jsPlumb.js'></script>
+   <script src='../Additional/littleFuns.js'></script>         
+   <!--Connecting internal scripts-->
+   <script src='../Classes/Presenter.js'></script>
+   <script src='../Classes/FieldElement.js'></script>
+   <script src='../Classes/Window.js'></script>
+   <script src='../Classes/Maquette.js'></script>
+   <script src='../Classes/ModulesKeeper.js'></script>
+ </head>
+ <body>     
+     <div id='Header'>
+         HEADER BLOCK<br>
+           small text
+     </div>
+     <div id='Field'>
+        <br><br>
+     </div>           
+     <div id='Tools'>
+         <div id='Actions'>
+             MENU SECTION
+            <div class='menuLine'>Menu line</div>
+            <div class='menuLine'>Menu line</div>
+         </div>
+         <div id='ModulesSection'>MODULES SECTION</div>         
+     </div>
+     <div id='ToggleButton'>
+         <img id='ToggleImg' src="ToggleImage.png" width='50' height='45'>
+     </div>
+     <!--Event listeners and etc.-->    
+     <script src='PageviewScripts.js'></script>
+     <!--Animation script (Help for CSS)-->    
+     <script>
+         var menuOn = false;
+         var toggleBut = $('#ToggleImg')[0];
+         //$('#Tools').animate({width:'toggle'},0);  //closed by default                  
+         $('#ToggleButton').click(function(){                         
+             toggleTheMenu();
+         });
+     </script>
+     <!--The main Script-->
+     <script src='main.js'></script>
+ </body> 
+</html>
