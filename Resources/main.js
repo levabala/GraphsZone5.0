@@ -3,6 +3,9 @@
 //Workplace
 var Field = $('#Field')[0];
 
+//Header
+var Header = $('#Header')[0];
+
 //Controller
 var presenter = new Presenter('BIG BOSS');
 var mods = presenter.elements; //short link
@@ -29,5 +32,5 @@ win1.init();
 var mKeeper = new ModulesKeeper(0,$('#ModulesSection')[0],'mKeeper');
 
 //Console
-var cc = new Console();
-console.log(cc);
+//var cc = new Console();
+//console.log(cc);

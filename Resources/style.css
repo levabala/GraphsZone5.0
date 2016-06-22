@@ -99,6 +99,7 @@ body{
     box-shadow: 0 0 5px rgba(0,0,0,0.3);
     border: solid lightgray 3px;
     background: rgba(255,255,255,0.8); 
+    position: absolute
 }
 
 .maquette {

@@ -33,7 +33,16 @@ function Window(id,field,domId) {
 
         var params = this.getLineParams(obj1, obj2);
         // make hr
-        var line = "<div style='padding:0px; margin:0px; height:" + params.thickness + "px; background-color:" + params.color + "; line-height:1px; position:absolute; left:" + params.cx + "px; top:" + params.cy + "px; width:" + params.length + "px; -moz-transform:rotate(" + params.angle + "deg); -webkit-transform:rotate(" + params.angle + "deg); -o-transform:rotate(" + params.angle + "deg); -ms-transform:rotate(" + params.angle + "deg); transform:rotate(" + params.angle + "deg);' />";
+        var line = "<div style='padding:0px; margin:0px; height:" + params.thickness + 
+        "px; background-color:" + params.color + 
+        "; line-height:1px; position:absolute; left:" + params.cx + 
+        "px; top:" + params.cy + 
+        "px; width:" + params.length + 
+        "px; -moz-transform:rotate(" + params.angle + 
+        "deg); -webkit-transform:rotate(" + params.angle + 
+        "deg); -o-transform:rotate(" + params.angle + 
+        "deg); -ms-transform:rotate(" + params.angle + 
+        "deg); transform:rotate(" + params.angle + "deg);' />";
 
         var div = document.createElement('div');
         div.innerHTML = line;
@@ -68,13 +77,13 @@ function Window(id,field,domId) {
         var margin2 = getMargins(el2);        
 
         var thickness = 2;
-        var color = 'red';
+        var color = 'red';    
         // bottom right        
-        var x1 = offset1.left - margin1.left - (this.dom.getAttribute('data-x') || 0);//bRect1.left - (this.dom.getAttribute('data-x') || 0);
-        var y1 = offset1.top - margin1.top - (this.dom.getAttribute('data-y') || 0);//bRect1.top - (this.dom.getAttribute('data-y') || 0);
+        var x1 = offset1.left - margin1.left + size1.width/3 - (this.dom.getAttribute('data-x') || 0);//bRect1.left - (this.dom.getAttribute('data-x') || 0);
+        var y1 = offset1.top - margin1.top - window.getComputedStyle(Field).top.replace('px','') - (this.dom.getAttribute('data-y') || 0);//bRect1.top - (this.dom.getAttribute('data-y') || 0);
         // top right
-        var x2 = offset2.left - (this.dom.getAttribute('data-x') || 0);//bRect1.left - (this.dom.getAttribute('data-x') || 0);
-        var y2 = offset2.top - (this.dom.getAttribute('data-y') || 0);//bRect1.top - (this.dom.getAttribute('data-y') || 0);
+        var x2 = offset2.left - margin2.left + size2.width/3 - (this.dom.getAttribute('data-x') || 0);//bRect1.left - (this.dom.getAttribute('data-x') || 0);
+        var y2 = offset2.top - margin2.top - window.getComputedStyle(Field).top.replace('px','') - (this.dom.getAttribute('data-y') || 0);//bRect1.top - (this.dom.getAttribute('data-y') || 0);
         //console.log(getElementPosition(el1));
         // distance
         var length = Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
