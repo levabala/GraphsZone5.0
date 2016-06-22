@@ -2,6 +2,7 @@ function ModulesKeeper(id, field, domId) {
     var mk = this;
     //iheriting
     FieldElement.apply(this, arguments);
+    this.type = 'ModulesKeeper';
 
     this.dom.className = 'mKeeper';
     this.dom.style.width = '100%';

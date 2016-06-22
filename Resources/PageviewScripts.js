@@ -1,7 +1,71 @@
+interact('.fieldElement').dropzone({
+    // only accept elements matching this CSS selector
+    accept: '.maquette',
+    // Require a 75% element overlap for a drop to be possible
+    overlap: 0.2,
+
+    // listen for drop related events:
+
+    ondropactivate: function (event) {
+        // add active dropzone feedback
+        var draggableElement = event.relatedTarget;
+        draggableElement.style.background = 'rgb(230,200,200)';
+        console.log('dropactive');
+    },
+    ondragenter: function (event) {
+        var draggableElement = event.relatedTarget,
+            dropzoneElement = event.target;
+        dropzoneElement.style.background = 'rgb(200,230,200)';
+
+        // feedback the possibility of a drop
+        console.log('dragenter');
+    },
+    ondragleave: function (event) {
+        // remove the drop feedback style
+        var draggableElement = event.relatedTarget,
+            dropzoneElement = event.target;
+        dropzoneElement.style.background = 'white';
+        console.log('dropleave');
+    },
+    ondrop: function (event) {
+        var draggableElement = event.relatedTarget,
+            dropzoneElement = event.target;
+        draggableElement.style.background = 'red';
+        dropzoneElement.style.background = 'red';
+
+        setTimeout(function () {
+            draggableElement.style.background = 'white';
+            dropzoneElement.style.background = 'white';
+        }, 500);
+
+        var ev = new CustomEvent('elemdrop', {'detail': {dom: draggableElement, type: draggableElement.innerHTML}});
+        dropzoneElement.dispatchEvent(ev);        
+            
+        console.log('drop');
+    },
+    ondropdeactivate: function (event) {
+        // remove active dropzone feedback
+        event.relatedTarget.style.background = 'white';
+        console.log('dropdeactivate');
+    }
+});
+
+interact('.maquette').draggable({
+    inertia: false,
+    restrict: {
+        restriction: "none",
+        endOnly: true,
+        elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+    },
+    autoScroll: true,
+
+    onmove: dragMoveListener
+});
+
 // target elements with the "draggable" class
 interact('.fieldElement')
     .draggable({
-        inertia:false,
+        inertia: false,
         restrict: {
             restriction: "parent",
             endOnly: true,
@@ -60,48 +124,18 @@ function dragMoveListener(event) {
     // update the posiion attributes
     target.setAttribute('data-x', x);
     target.setAttribute('data-y', y);
-    
+
     event.stopPropagation();
 }
 
 // this is used later in the resizing and gesture demos
 window.dragMoveListener = dragMoveListener;
 
-interact('.fieldElement').dropzone({
-  // only accept elements matching this CSS selector
-  accept: '.fieldElement.unsetted',
-  // Require a 75% element overlap for a drop to be possible
-  overlap: 0.75,
 
-  // listen for drop related events:
-
-  ondropactivate: function (event) {
-    // add active dropzone feedback
-    console.log('dropactive');
-  },
-  ondragenter: function (event) {
-    var draggableElement = event.relatedTarget,
-        dropzoneElement = event.target;
-
-    // feedback the possibility of a drop
-    console.log('dragenter');
-  },
-  ondragleave: function (event) {
-    // remove the drop feedback style
-    console.log('dropleave');
-  },
-  ondrop: function (event) {
-    console.log('drop');
-  },
-  ondropdeactivate: function (event) {
-    // remove active dropzone feedback
-    console.log('dropdeactivate');
-  }
-});
 
 //---------------------------------------------------
 //HOT KEYS
-document.onkeypress = function (e) {    
+document.onkeypress = function (e) {
     switch (e.keyCode) {
         case 1081:
         case 113: {
@@ -111,7 +145,7 @@ document.onkeypress = function (e) {
     }
 };
 
-function toggleTheMenu() {    
+function toggleTheMenu() {
     $('#Tools').animate({ width: 'toggle' }, 350);
     if (!menuOn) {
         toggleBut.src = "CloseImage.png";

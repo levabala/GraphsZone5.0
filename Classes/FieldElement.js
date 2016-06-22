@@ -4,8 +4,6 @@ function FieldElement(id, field, domId) {
     //------------------    
     var fEl = this;
 
-    console.log(field)
-
     this._id = id;
     this.width = 200;
     this.height = 100;
@@ -14,8 +12,11 @@ function FieldElement(id, field, domId) {
     this.dom.className = 'fieldElement';
     this.dom.style.width = this.width + 'px';
     this.dom.style.height = this.height + 'px';
+    this.dom.dragging = false;    
     if (domId) this.dom.id = domId;
     this.connectingStarted = false;
+
+    this.type = 'FieldElement';
 
     this.title = document.createElement('input');
     this.title.className = 'title';
@@ -28,6 +29,16 @@ function FieldElement(id, field, domId) {
 
     this.inputs = {};
     this.outputs = {};
+    this.dataOut = {};
+    this.dataIn = {};
+
+    //listening for dropping
+    this.dom.addEventListener('elemdrop',function(event){
+        console.log(event)
+        if (fEl.appendElement(event.detail.type))
+            event.detail.dom.parentNode.removeChild(event.detail.dom);
+    });
+    //-----
 
     field.appendChild(this.dom);
 
@@ -51,7 +62,7 @@ function FieldElement(id, field, domId) {
         if (this._id != to._id && !this.outputs[to._id] && !this.inputs[to._id] && to.connectFrom(this)) {
             this.outputs[to._id] = to;
             console.log('succConnect',[fEl._id, to._id]);
-            var SuccessfulConnectEvent = new CustomEvent('succConnect', { 'detail': [fEl._id, to._id] });
+            var SuccessfulConnectEvent = new CustomEvent('succConnect', { 'detail': [fEl, to] });
             field.dispatchEvent(SuccessfulConnectEvent);
 
             this.connectingStarted = false;
@@ -59,6 +70,7 @@ function FieldElement(id, field, domId) {
             field.removeEventListener('tryToConnect', this.connecting, true);
             return true;
         }
+        console.warn('Fail to connect!');
         return false;
     };
 
@@ -83,5 +95,21 @@ function FieldElement(id, field, domId) {
 
     this.connecting = function (e) {
         fEl.connectTo(e.detail);
+    };
+
+    this.appendElement = function (){
+
+    };
+
+    this.sendData = function(){
+        for (var o in this.outputs){
+            console.log('sendTo',o);
+            this.outputs[o].receiveData(this.dataOut);
+        }
+    };
+
+    this.receiveData = function(data){
+        console.log('ondata:',data);
+        this.dataIn = data;
     };
 }

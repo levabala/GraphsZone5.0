@@ -7,28 +7,29 @@ function Window(id,field,domId) {
     //main code    
     var counter = 0;    
     this.setSize(500, 300);
-    this.connections = {};            
+    this.connections = {};  
+    this.type = 'Window';          
     //--------------------------------------
     //Listeners
     this.dom.onclick = null;
     this.dom.addEventListener('succConnect',function(e){
         win.connect(e.detail[0],e.detail[1]);
-    });
+    });    
 
     //New elements
-    this.appendElement = function () {
-        var elem = new FieldElement(counter, this.dom, this._id + '_' + counter);
-        this.children[counter] = elem;
+    this.appendElement = function (type) {
+        var elem = presenter.createModule(type,this.dom, this._id + '_' + counter);        
+        this.children[elem._id] = elem;
         counter++;
 
-        return counter - 1;
+        return elem;
     };
 
 
     //About connecting
     this.connect = function (obj1, obj2) {        
-        //check for existing
-        if (!this.children[obj1].outputs[obj2] || !this.children[obj2].inputs[obj1]) return false;
+        //check for existing                        
+        if (typeof obj1 == 'undefined' || typeof obj2 == 'undefined') return false;
 
         var params = this.getLineParams(obj1, obj2);
         // make hr
@@ -44,26 +45,36 @@ function Window(id,field,domId) {
         circle1.style.top = params.pos1.y+'px';*/
 
 
-        this.dom.insertBefore(element, this.dom.firstChild);
+        this.dom.insertBefore(element, this.dom.firstChild);        
         //this.dom.insertBefore(circle1, this.dom.firstChild);
-        if (!this.connections[obj1]) this.connections[obj1] = {};
-        this.connections[obj1][obj2] = element;
+        if (!this.connections[obj1._id]) this.connections[obj1._id] = {};
+        this.connections[obj1._id][obj2._id] = element;               
     };
 
     this.getLineParams = function (obj1, obj2) {
-        var el1 = this.children[obj1].dom;
-        var el2 = this.children[obj2].dom;
+        var el1 = obj1.dom;
+        var el2 = obj2.dom;
+
+        var offset1 = getOffsetRect(el1);
+        var offset2 = getOffsetRect(el2);        
+
         var bRect1 = el1.getBoundingClientRect();
         var bRect2 = el2.getBoundingClientRect();
 
+        var size1 = getSize(el1);
+        var size2 = getSize(el2);        
+
+        var margin1 = getMargins(el1);
+        var margin2 = getMargins(el2);        
+
         var thickness = 2;
         var color = 'red';
-        // bottom right
-        var x1 = bRect1.left + bRect1.width / 4.7 - (this.dom.getAttribute('data-x') || 0);
-        var y1 = bRect1.top - bRect1.height / 0.75 - (this.dom.getAttribute('data-y') || 0);
+        // bottom right        
+        var x1 = offset1.left - margin1.left - (this.dom.getAttribute('data-x') || 0);//bRect1.left - (this.dom.getAttribute('data-x') || 0);
+        var y1 = offset1.top - margin1.top - (this.dom.getAttribute('data-y') || 0);//bRect1.top - (this.dom.getAttribute('data-y') || 0);
         // top right
-        var x2 = bRect2.left + bRect2.width / 4.7 - (this.dom.getAttribute('data-x') || 0);
-        var y2 = bRect2.top - bRect2.height / 0.75 - (this.dom.getAttribute('data-y') || 0);
+        var x2 = offset2.left - (this.dom.getAttribute('data-x') || 0);//bRect1.left - (this.dom.getAttribute('data-x') || 0);
+        var y2 = offset2.top - (this.dom.getAttribute('data-y') || 0);//bRect1.top - (this.dom.getAttribute('data-y') || 0);
         //console.log(getElementPosition(el1));
         // distance
         var length = Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
@@ -85,17 +96,18 @@ function Window(id,field,domId) {
         };
     };
 
-    this.refreshConnections = function () {
+    this.refreshConnections = function () {                
         for (var c1 in win.connections) {
-            for (var c2 in win.connections[c1]) {
-                win.dom.removeChild(win.connections[c1][c2]); //и так сойдёт))       
-                win.connect(c1, c2);
+            for (var c2 in win.connections[c1]) {                
+                win.dom.removeChild(win.connections[c1][c2]); //и так сойдёт))                       
+                win.connect(win.children[c1], win.children[c2]);
             }
         }
     };
 
     this.init = function () {
         var target;
+        console.log(this.children);
         for (var ch in this.children) {
             target = this.children[ch].dom,
                 // keep the dragged position in the data-x/data-y attributes

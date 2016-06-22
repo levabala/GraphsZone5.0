@@ -1,9 +1,10 @@
 function Maquette(name,field){
     this._name = name;
     this.dom = document.createElement('div');
-    this.dom.className = 'fieldElement unsetted';     
+    this.dom.className = 'maquette';     
 
     field.appendChild(this.dom);
+    this.type = 'Maquette';
 
     this.setSize = function (w, h) {
         this.width = w;
