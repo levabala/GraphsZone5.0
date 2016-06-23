@@ -1,4 +1,4 @@
-function FieldElement(id, field, domId) {
+function FieldElement(id, parent, domId) {
     //check the ids for unquie    
     //if (!registerId(domId) && domId) return false;
     //------------------    
@@ -12,7 +12,8 @@ function FieldElement(id, field, domId) {
     this.dom.className = 'fieldElement';
     this.dom.style.width = this.width + 'px';
     this.dom.style.height = this.height + 'px';
-    this.dom.dragging = false;    
+    this.dom.dragging = false;   
+    this.parent = parent;     
     if (domId) this.dom.id = domId;
     this.connectingStarted = false;
 
@@ -34,13 +35,12 @@ function FieldElement(id, field, domId) {
 
     //listening for dropping
     this.dom.addEventListener('elemdrop',function(event){
-        console.log(event)
+        console.log(event);
         if (fEl.appendElement(event.detail.type))
             event.detail.dom.parentNode.removeChild(event.detail.dom);
     });
-    //-----
-
-    field.appendChild(this.dom);
+    //-----        
+    parent.dom.appendChild(this.dom);
 
     this.setSize = function (w, h) {
         fEl.width = w;
@@ -54,7 +54,7 @@ function FieldElement(id, field, domId) {
 
         this.connectingStarted = false;
         this.dom.style.background = 'rgba(255,255,255,0.8)';        
-        field.removeEventListener('tryToConnect', this.connecting, true);
+        parent.dom.removeEventListener('tryToConnect', this.connecting, true);
         return true;
     };
 
@@ -63,11 +63,11 @@ function FieldElement(id, field, domId) {
             this.outputs[to._id] = to;
             console.log('succConnect',[fEl._id, to._id]);
             var SuccessfulConnectEvent = new CustomEvent('succConnect', { 'detail': [fEl, to] });
-            field.dispatchEvent(SuccessfulConnectEvent);
+            parent.dom.dispatchEvent(SuccessfulConnectEvent);
 
             this.connectingStarted = false;
             this.dom.style.background = 'rgba(255,255,255,0.8)';            
-            field.removeEventListener('tryToConnect', this.connecting, true);
+            parent.dom.removeEventListener('tryToConnect', this.connecting, true);
             return true;
         }
         console.warn('Fail to connect!');
@@ -79,7 +79,7 @@ function FieldElement(id, field, domId) {
             if (fEl.connectingStarted) {
                 fEl.connectingStarted = false;
                 fEl.dom.style.background = 'rgba(255,255,255,0.8)';
-                field.removeEventListener('tryToConnect', fEl.connecting, true);
+                parent.dom.removeEventListener('tryToConnect', fEl.connecting, true);
             }
             else {                                
                 fEl.connectingStarted = true;
@@ -87,10 +87,18 @@ function FieldElement(id, field, domId) {
 
                 var wantToConnectEvent = new CustomEvent('tryToConnect', { 'detail': fEl });
                 fEl.dom.dispatchEvent(wantToConnectEvent);
-                field.addEventListener('tryToConnect', fEl.connecting, true);                
+                parent.dom.addEventListener('tryToConnect', fEl.connecting, true);                
             }
         }
         e.stopPropagation();
+    };
+
+    this.dom.onkeypress = function(e){
+        switch(e.which){
+            case 46:{
+                fEl.delete();
+            }
+        }
     };
 
     this.connecting = function (e) {
@@ -99,6 +107,10 @@ function FieldElement(id, field, domId) {
 
     this.appendElement = function (){
 
+    };
+
+    this.delete = function(){
+        presenter.delete(this._id);
     };
 
     this.sendData = function(){

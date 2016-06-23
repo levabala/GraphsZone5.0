@@ -2,6 +2,11 @@
 
 //Workplace
 var Field = $('#Field')[0];
+Field.addEventListener('elemdrop',function(event){
+    if (event.detail.type != 'Window') return;
+    if (presenter.createModule(event.detail.type))
+            event.detail.dom.parentNode.removeChild(event.detail.dom);
+});
 
 //Header
 var Header = $('#Header')[0];
@@ -10,8 +15,8 @@ var Header = $('#Header')[0];
 var presenter = new Presenter('BIG BOSS');
 var mods = presenter.elements; //short link
 
-//Test Window
-var win1 = presenter.createModule('Window',Field,'win1'); 
+//Test Window 
+var win1 = presenter.createModule('Window',{dom:Field},'win1'); 
 var o1 = win1.appendElement('FieldElement');
 var o2 = win1.appendElement('FieldElement');
 
@@ -29,8 +34,8 @@ jsPlumb.ready(function(){
 win1.init();
 
 //Modules Keeper
-var mKeeper = new ModulesKeeper(0,$('#ModulesSection')[0],'mKeeper');
+var mKeeper = new ModulesKeeper(0,{dom:$('#ModulesSection')[0]},'mKeeper');
 
 //Console
-//var cc = new Console();
-//console.log(cc);
+var cc = new Console();
+console.log(cc);

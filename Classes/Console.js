@@ -1,6 +1,8 @@
 function Console() {
     var c = this;
-    var consoleWin = window.open('', 'Console', 'width=700,height=800');
+    var params = 'width=700,height=800';
+    if (window.leftScreenBoundry) params =  'width=700,height=800,screenX=' + window.leftScreenBoundry() + ' , left=' + window.leftScreenBoundry();
+    var consoleWin = window.open('', 'Console', params);
     var consoleHistory = ['help'];
     var consoleIndex = 1;
     var command = '';

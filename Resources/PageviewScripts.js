@@ -1,4 +1,4 @@
-interact('.fieldElement').dropzone({
+interact('.fieldElement, #Field').dropzone({
     // only accept elements matching this CSS selector
     accept: '.maquette',
     // Require a 75% element overlap for a drop to be possible
@@ -30,13 +30,13 @@ interact('.fieldElement').dropzone({
     ondrop: function (event) {
         var draggableElement = event.relatedTarget,
             dropzoneElement = event.target;
-        draggableElement.style.background = 'red';
-        dropzoneElement.style.background = 'red';
+        /*draggableElement.style.background = 'red';
+        dropzoneElement.style.background = 'red';*/
 
-        setTimeout(function () {
+        //setTimeout(function () {
             draggableElement.style.background = 'white';
             dropzoneElement.style.background = 'white';
-        }, 500);
+        //}, 500);
 
         var ev = new CustomEvent('elemdrop', {'detail': {dom: draggableElement, type: draggableElement.innerHTML}});
         dropzoneElement.dispatchEvent(ev);        
