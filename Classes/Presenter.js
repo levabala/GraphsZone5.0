@@ -2,9 +2,10 @@ function Presenter(name) {
     this._name = name;
     this.elements = {};
     this.availableModules = {
-        'FieldElement': FieldElement,
+        //'FieldElement': FieldElement,
         'Window': Window,
-        'Maquette': Maquette
+        'Maquette': Maquette,
+        'GraphPlotly': GraphPlotly
     };
     var counter = 0;
 
@@ -13,11 +14,24 @@ function Presenter(name) {
         'FieldElement': 'Basic module'
     };
 
-    this.createModule = function (m, field, name) {
-        if (!this.availableModules[m]) return false;
-
-        if (!field) field = {dom:Field}; //default workplace                
+    this.createModule = function (m, field, name) {        
+        if (!this.availableModules[m]) return false;                
+        if (!field) field = { dom: Field }; //default workplace
+        else if (!field.dom) field = {dom: field};                        
         var module = new this.availableModules[m](counter, field, (name || ''));
+        
+        var number = field.dom.childNodes.length;
+        var x = number*3;
+        var y = number*7;
+        // translate the element
+        module.dom.style.webkitTransform =
+            module.dom.style.transform =
+            'translate(' + x + 'px, ' + y + 'px)';
+
+        // update the posiion attributes
+        module.dom.setAttribute('data-x', x);
+        module.dom.setAttribute('data-y', y);
+
         console.log(module._id + ": " + m + ' or ' + module.type);
         if (typeof module._id != 'undefined') {
             this.elements[module._id] = module;

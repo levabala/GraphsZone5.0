@@ -4,7 +4,8 @@
    <title>GraphsZone5.0</title>
    <meta charset="utf-8">
    <link rel="stylesheet" type="text/css" href="style.css">   
-   <script src="http://code.jquery.com/jquery-latest.min.js"></script>   
+   <script src="http://code.jquery.com/jquery-latest.min.js"></script>  
+   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
    <!--Connecting external scripts-->   
    <script src='../Additional/Interact.js'></script>
    <script src='../Additional/jsPlumb.js'></script>
@@ -16,6 +17,12 @@
    <script src='../Classes/Maquette.js'></script>
    <script src='../Classes/ModulesKeeper.js'></script>
    <script src='../Classes/Console.js'></script> 
+   <!--Connecting Modules0-->
+   <script src='../Classes/Modules/Data.js'></script>
+   <script src='../Classes/Modules/GraphPlotly.js'></script>
+   <!--Workers-->
+   <script src='WORKER_FileUploader.js'></script>
+   <script src='WORKER_RandomPoints.js'></script>
  </head>
  <body>     
      <div id='Header'>
@@ -23,7 +30,7 @@
            small text
      </div>
      <div id='Field'>
-        <br><br>
+        
      </div>           
      <div id='Tools'>
          <div id='Actions'>
@@ -31,7 +38,7 @@
             <div class='menuLine'>Menu line</div>
             <div class='menuLine'>Menu line</div>
          </div>
-         <div id='ModulesSection'>MODULES SECTION</div>         
+         <div id='ModulesSection'>MODULES SECTION<button class='button' onclick="mKeeper.refreshModulesList()">Refresh</button></div>         
      </div>
      <div id='ToggleButton'>
          <img id='ToggleImg' src="ToggleImage.png" width='50' height='45'>
@@ -41,10 +48,11 @@
      <!--Animation script (Help for CSS)-->    
      <script>
          var menuOn = false;
-         var toggleBut = $('#ToggleImg')[0];
-         //$('#Tools').animate({width:'toggle'},0);  //closed by default                  
+         var toggleBut = $('#ToggleImg')[0];         
+         $('#Tools').animate({width:'toggle'},0);  //closed by default
+         //toggleTheMenu(350);                  
          $('#ToggleButton').click(function(){                         
-             toggleTheMenu();
+             toggleTheMenu(350);
          });
      </script>
      <!--The main Script-->

@@ -1,4 +1,11 @@
-//var Identificators = [];
+//init workers
+try{
+    var FileUploader = new Worker('WORKER_FileUploader.js');
+    var RandomPoints = new Worker('WORKER_RandomPoints.js');
+}
+catch(e){
+    console.warn(e);
+}
 
 //Workplace
 var Field = $('#Field')[0];
@@ -16,14 +23,13 @@ var presenter = new Presenter('BIG BOSS');
 var mods = presenter.elements; //short link
 
 //Test Window 
-var win1 = presenter.createModule('Window',{dom:Field},'win1'); 
-var o1 = win1.appendElement('FieldElement');
-var o2 = win1.appendElement('FieldElement');
-
-o1.connectTo(o2);
-
-
-
+var win1 = presenter.createModule('Window',Field,'win1');
+win1.setSize(900,500); 
+//var o1 = win1.appendElement('FieldElement');
+//var o2 = win1.appendElement('FieldElement');
+var gr = win1.appendElement('GraphPlotly');
+gr.setSize(800,450);
+//o1.connectTo(o2);
 
 //Creating manual connection
 jsPlumb.ready(function(){
@@ -34,8 +40,8 @@ jsPlumb.ready(function(){
 win1.init();
 
 //Modules Keeper
-var mKeeper = new ModulesKeeper(0,{dom:$('#ModulesSection')[0]},'mKeeper');
+var mKeeper = new ModulesKeeper(0,$('#ModulesSection')[0],'mKeeper');
 
 //Console
-var cc = new Console();
-console.log(cc);
+//var cc = new Console();
+//console.log(cc);

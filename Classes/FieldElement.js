@@ -12,8 +12,8 @@ function FieldElement(id, parent, domId) {
     this.dom.className = 'fieldElement';
     this.dom.style.width = this.width + 'px';
     this.dom.style.height = this.height + 'px';
-    this.dom.dragging = false;   
-    this.parent = parent;     
+    this.dom.dragging = false;
+    this.parent = parent;
     if (domId) this.dom.id = domId;
     this.connectingStarted = false;
 
@@ -21,20 +21,20 @@ function FieldElement(id, parent, domId) {
 
     this.title = document.createElement('input');
     this.title.className = 'title';
-    this.title.value = domId; 
-    this.title.onchanged = function(){
+    this.title.value = domId;
+    this.title.onchanged = function () {
         //here can be a dependence between title and id
-    };
-
-    this.dom.insertBefore(this.title,this.dom.firstChild);    
+    };    
 
     this.inputs = {};
     this.outputs = {};
     this.dataOut = {};
     this.dataIn = {};
+    this.requiredFiles = [];
+    this.cachedFiles = {};
 
     //listening for dropping
-    this.dom.addEventListener('elemdrop',function(event){
+    this.dom.addEventListener('elemdrop', function (event) {
         console.log(event);
         if (fEl.appendElement(event.detail.type))
             event.detail.dom.parentNode.removeChild(event.detail.dom);
@@ -47,26 +47,30 @@ function FieldElement(id, parent, domId) {
         fEl.height = h;
         fEl.dom.style.width = w + 'px';
         fEl.dom.style.height = h + 'px';
+        fEl.dom.width = w;
+        fEl.dom.height = h;
+
+        fEl.dom.dispatchEvent(new Event('change'));
     };
 
-    this.connectFrom = function (fr) {        
+    this.connectFrom = function (fr) {
         this.inputs[fr._id] = fr;
 
         this.connectingStarted = false;
-        this.dom.style.background = 'rgba(255,255,255,0.8)';        
+        this.dom.style.background = 'rgba(255,255,255,0.8)';
         parent.dom.removeEventListener('tryToConnect', this.connecting, true);
         return true;
     };
 
-    this.connectTo = function (to) {                
+    this.connectTo = function (to) {
         if (this._id != to._id && !this.outputs[to._id] && !this.inputs[to._id] && to.connectFrom(this)) {
             this.outputs[to._id] = to;
-            console.log('succConnect',[fEl._id, to._id]);
+            console.log('succConnect', [fEl._id, to._id]);
             var SuccessfulConnectEvent = new CustomEvent('succConnect', { 'detail': [fEl, to] });
             parent.dom.dispatchEvent(SuccessfulConnectEvent);
 
             this.connectingStarted = false;
-            this.dom.style.background = 'rgba(255,255,255,0.8)';            
+            this.dom.style.background = 'rgba(255,255,255,0.8)';
             parent.dom.removeEventListener('tryToConnect', this.connecting, true);
             return true;
         }
@@ -81,47 +85,102 @@ function FieldElement(id, parent, domId) {
                 fEl.dom.style.background = 'rgba(255,255,255,0.8)';
                 parent.dom.removeEventListener('tryToConnect', fEl.connecting, true);
             }
-            else {                                
+            else {
                 fEl.connectingStarted = true;
                 fEl.dom.style.background = 'rgba(255,0,0,0.1)';
 
                 var wantToConnectEvent = new CustomEvent('tryToConnect', { 'detail': fEl });
                 fEl.dom.dispatchEvent(wantToConnectEvent);
-                parent.dom.addEventListener('tryToConnect', fEl.connecting, true);                
+                parent.dom.addEventListener('tryToConnect', fEl.connecting, true);
             }
         }
         e.stopPropagation();
     };
 
-    this.dom.onkeypress = function(e){
-        switch(e.which){
-            case 46:{
+    document.addEventListener('keydown', function (e) {
+        if (!fEl.connectingStarted) return;
+        switch (e.which) {
+            case 46: {
                 fEl.delete();
             }
         }
-    };
+    });
 
     this.connecting = function (e) {
         fEl.connectTo(e.detail);
     };
 
-    this.appendElement = function (){
+    this.appendElement = function () {
 
     };
 
-    this.delete = function(){
+    this.delete = function () {
+        parent.dom.removeEventListener('tryToConnect', fEl.connecting, true);
         presenter.delete(this._id);
     };
 
-    this.sendData = function(){
-        for (var o in this.outputs){
-            console.log('sendTo',o);
+    this.sendData = function () {
+        for (var o in this.outputs) {
+            console.log('sendTo', o);
             this.outputs[o].receiveData(this.dataOut);
         }
     };
 
-    this.receiveData = function(data){
-        console.log('ondata:',data);
+    this.receiveData = function (data) {
+        console.log('ondata:', data);
         this.dataIn = data;
+    };
+
+    this.dom.ondragenter = function (event) {
+        fEl.dom.style.background = '#e6ffe6';
+        event.stopPropagation();
+        event.preventDefault();
+    };
+
+    this.dom.ondrop = function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        fEl.dom.style.background = 'white';
+
+        // Check for the various File API support.
+        if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
+            alert('The File APIs are not fully supported in this browser.');
+            return;
+        }
+
+        console.log(event);
+        fEl.requiredFiles = event.dataTransfer.files;
+        fEl.uploadFiles();
+    };
+
+    this.dom.ondragleave = function (event) {
+        fEl.dom.style.background = 'white';
+
+        event.stopPropagation();
+        event.preventDefault();
+    };
+
+    this.dom.ondragover = function (event) {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'copy';
+    };
+
+    this.uploadFiles = function(){
+        FileUploader.addEventListener('message', fEl.cacheFiles);
+        FileUploader.onerror = function(err){console.log(err);};
+        FileUploader.postMessage(this.requiredFiles);        
+    };
+
+    this.cacheFiles = function(e){        
+        for (var f in e.data) fEl.cachedFiles[f] = e.data[f];
+        FileUploader.removeEventListener('message', fEl.cacheFiles);
+    };
+
+    this.addTitle = function(){
+        this.dom.insertBefore(this.title, this.dom.firstChild);
+    };
+
+    this.resizeEvent = function(){
+
     };
 }

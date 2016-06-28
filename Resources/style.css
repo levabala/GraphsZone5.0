@@ -104,7 +104,7 @@ body{
 
 .maquette {
     border: solid lightgray 3px;
-    background: rgba(255,255,255,0.8); 
+    background: white;/*rgba(255,255,255,0.8);*/ 
 }
 
 .fieldElement.unsetted {
@@ -125,6 +125,13 @@ body{
     position: absolute;    
 }
 
+moveButton {
+    width: 30px;
+    height: 30px;
+    background: gray;
+    float: right;    
+}
+
 .title {
     background: rgba(250,250,250,0.8);
     font-family: fantasy;
@@ -139,4 +146,24 @@ body{
     border: solid black 1px;
 }
 
+.button {
+    background-color: #ff471a; /* Green */
+    border: none;
+    transition-duration: 0.3s;
+    color: white;
+    padding: 10px 20px;
+    margin: 5px;
+    text-align: center;
+    text-decoration: none;    
+    font-size: 13px;
+    float: right;
+}
+.button:hover{
+    background: #b30000;
+}
+
+.button:active {
+    transition-duration: 0.4s;
+    background: #800000;
+}
 

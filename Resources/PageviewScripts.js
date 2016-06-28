@@ -10,7 +10,7 @@ interact('.fieldElement, #Field').dropzone({
         // add active dropzone feedback
         var draggableElement = event.relatedTarget;
         draggableElement.style.background = 'rgb(230,200,200)';
-        console.log('dropactive');
+        //console.log('dropactive');
     },
     ondragenter: function (event) {
         var draggableElement = event.relatedTarget,
@@ -18,14 +18,14 @@ interact('.fieldElement, #Field').dropzone({
         dropzoneElement.style.background = 'rgb(200,230,200)';
 
         // feedback the possibility of a drop
-        console.log('dragenter');
+        //console.log('dragenter');
     },
     ondragleave: function (event) {
         // remove the drop feedback style
         var draggableElement = event.relatedTarget,
             dropzoneElement = event.target;
         dropzoneElement.style.background = 'white';
-        console.log('dropleave');
+        //console.log('dropleave');
     },
     ondrop: function (event) {
         var draggableElement = event.relatedTarget,
@@ -41,12 +41,12 @@ interact('.fieldElement, #Field').dropzone({
         var ev = new CustomEvent('elemdrop', {'detail': {dom: draggableElement, type: draggableElement.innerHTML}});
         dropzoneElement.dispatchEvent(ev);        
             
-        console.log('drop');
+        //console.log('drop');
     },
     ondropdeactivate: function (event) {
         // remove active dropzone feedback
         event.relatedTarget.style.background = 'white';
-        console.log('dropdeactivate');
+        //console.log('dropdeactivate');
     }
 });
 
@@ -96,6 +96,9 @@ interact('.fieldElement')
         target.style.width = event.rect.width + 'px';
         target.style.height = event.rect.height + 'px';
 
+        target.width = event.rect.width;
+        target.height = event.rect.height;
+
         // translate when resizing from top or left edges
         x += event.deltaRect.left;
         y += event.deltaRect.top;
@@ -105,7 +108,9 @@ interact('.fieldElement')
 
         target.setAttribute('data-x', x);
         target.setAttribute('data-y', y);
-        //target.textContent = Math.round(event.rect.width) + '×' + Math.round(event.rect.height);
+        //target.textContent = Math.round(event.rect.width) + '×' + Math.round(event.rect.height);        
+
+        target.dispatchEvent(new Event('change'));
 
         event.stopPropagation();
     });
@@ -145,8 +150,8 @@ document.onkeypress = function (e) {
     }
 };
 
-function toggleTheMenu() {
-    $('#Tools').animate({ width: 'toggle' }, 350);
+function toggleTheMenu(speed) {
+    $('#Tools').animate({ width: 'toggle' }, speed);
     if (!menuOn) {
         toggleBut.src = "CloseImage.png";
         toggleBut.width = 50;

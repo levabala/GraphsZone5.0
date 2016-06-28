@@ -131,14 +131,6 @@ function removeId(fromDom, id) {
     Identificators.splice(Identificators.indexOf(id), 1);
 }*/
 
-//second screen
-// Find Left Boundry of the Screen/Monitor
-function FindLeftScreenBoundry() {
-    if (window.leftWindowBoundry() > window.screen.width)
-        return window.leftWindowBoundry() - (window.leftWindowBoundry() - window.screen.width);
-    if (window.leftWindowBoundry() < 0 && window.leftWindowBoundry() > (window.screen.width * -1))
-        return (window.screen.width * -1);
-    return 0;
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-
-window.leftScreenBoundry = FindLeftScreenBoundry;

@@ -1,8 +1,12 @@
 function Console() {
     var c = this;
-    var params = 'width=700,height=800';
-    if (window.leftScreenBoundry) params =  'width=700,height=800,screenX=' + window.leftScreenBoundry() + ' , left=' + window.leftScreenBoundry();
-    var consoleWin = window.open('', 'Console', params);
+    var w = 700;
+    var h = 800;   
+    var consoleWin = window.open('', 'Console', 'height='+h+',width='+w);
+    var left = -w;
+    var top = 0;
+    consoleWin.moveBy(left,top);
+
     var consoleHistory = ['help'];
     var consoleIndex = 1;
     var command = '';
