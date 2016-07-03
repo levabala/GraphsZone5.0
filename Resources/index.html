@@ -4,8 +4,11 @@
    <title>GraphsZone5.0</title>
    <meta charset="utf-8">
    <link rel="stylesheet" type="text/css" href="style.css">   
+   <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.css">
+   <!--Libraries-->
    <script src="http://code.jquery.com/jquery-latest.min.js"></script>  
    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"></script>   
    <!--Connecting external scripts-->   
    <script src='../Additional/Interact.js'></script>
    <script src='../Additional/jsPlumb.js'></script>
@@ -20,9 +23,12 @@
    <!--Connecting Modules0-->
    <script src='../Classes/Modules/Data.js'></script>
    <script src='../Classes/Modules/GraphPlotly.js'></script>
+   <script src='../Classes/Modules/GraphVis.js'></script>
+   <script src='../Classes/Modules/Graph.js'></script>
    <!--Workers-->
    <script src='WORKER_FileUploader.js'></script>
    <script src='WORKER_RandomPoints.js'></script>
+   <script src='WORKER_DataParser.js'></script>
  </head>
  <body>     
      <div id='Header'>

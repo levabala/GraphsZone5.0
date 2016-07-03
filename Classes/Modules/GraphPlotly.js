@@ -48,13 +48,12 @@ function GraphPlotly(id, field, domId) {
         title: 'That\' only a PLOT!'
     };
 
-    this.dom.innerHTML = '<h1>Rendering...</h1>';
-
-    RandomPoints.postMessage('get');
+    //RandomPoints.postMessage('get');
+    //this.dom.innerHTML = '<h1>Rendering...</h1>';
     var getted = false;
     RandomPoints.onmessage = function (arr) {
         console.log('Rendered')
-        gPl.dom.innerHTML = "";        
+        gPl.dom.innerHTML = "";
         Plotly.plot(gPl.dom, arr.data, layout);
         var plot = gPl.dom.getElementsByClassName('plot-container plotly')[0];
         getted = true;
@@ -63,18 +62,24 @@ function GraphPlotly(id, field, domId) {
         };
     };
 
+    this.afterUpload = function () {
+        console.clear();
+        var currentData = {
+            type: 'stringXYZ',
+            data: this.cachedFiles
+        };
+        DataParser.postMessage(currentData);
+    };
+
     var mb = document.createElement('moveButton');
     this.dom.appendChild(mb);
-
-
-
-    mb.style.webkitTransform =
-        mb.style.transform =
-        'translate(' + 0 + 'px, ' + -30 + 'px)';
 
     this.dom.onchange = function () {
         layout.width = gPl.dom.width;
         layout.height = gPl.dom.height;
         if (getted) Plotly.relayout(gPl.dom, layout);
+        mb.style.webkitTransform =
+            mb.style.transform =
+            'translate(' + (gPl.dom.width - 30) + 'px, ' + (gPl.dom.height - 30) + 'px)';
     };
 }

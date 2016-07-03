@@ -168,12 +168,21 @@ function FieldElement(id, parent, domId) {
     this.uploadFiles = function(){
         FileUploader.addEventListener('message', fEl.cacheFiles);
         FileUploader.onerror = function(err){console.log(err);};
-        FileUploader.postMessage(this.requiredFiles);        
+        FileUploader.postMessage({
+            files: this.requiredFiles,
+            mode: 'String'
+        });                
     };
 
+    this.afterUpload = function(){
+
+    }; 
+
     this.cacheFiles = function(e){        
+        
         for (var f in e.data) fEl.cachedFiles[f] = e.data[f];
         FileUploader.removeEventListener('message', fEl.cacheFiles);
+        fEl.afterUpload();
     };
 
     this.addTitle = function(){

@@ -5,7 +5,8 @@ function Presenter(name) {
         //'FieldElement': FieldElement,
         'Window': Window,
         'Maquette': Maquette,
-        'GraphPlotly': GraphPlotly
+        'GraphPlotly': GraphPlotly,
+        'GraphVis': GraphVis
     };
     var counter = 0;
 
