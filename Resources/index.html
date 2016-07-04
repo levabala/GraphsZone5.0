@@ -5,11 +5,14 @@
    <meta charset="utf-8">
    <link rel="stylesheet" type="text/css" href="style.css">   
    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.css">
+   <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/><!--Подключаем стили CSS для библиотеки Jquery UI-->
    <!--Libraries-->
    <script src="http://code.jquery.com/jquery-latest.min.js"></script>  
-   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"></script>   
-   <!--Connecting external scripts-->   
+   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>    
+   <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script><!--Подключаем библиотеку Jquery UI-->
+   <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"></script> We use our modefied library-->   
+   <!--Connecting external scripts-->
+   <script src='../Additional/VisjsOpen.js'></script>   
    <script src='../Additional/Interact.js'></script>
    <script src='../Additional/jsPlumb.js'></script>
    <script src='../Additional/littleFuns.js'></script>         
@@ -29,12 +32,13 @@
    <script src='WORKER_FileUploader.js'></script>
    <script src='WORKER_RandomPoints.js'></script>
    <script src='WORKER_DataParser.js'></script>
+   <script src='WORKER_DataFormater.js'></script>
  </head>
  <body>     
-     <div id='Header'>
+     <!--<div id='Header'>
          HEADER BLOCK<br>
            small text
-     </div>
+     </div>-->
      <div id='Field'>
         
      </div>           

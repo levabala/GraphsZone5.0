@@ -3,6 +3,7 @@ try {
     var FileUploader = new Worker('WORKER_FileUploader.js');
     var RandomPoints = new Worker('WORKER_RandomPoints.js');
     var DataParser = new Worker('WORKER_DataParser.js');
+    var DataFormater = new Worker('WORKER_DataFormater.js');
 }
 catch (e) {
     console.warn(e);
@@ -25,11 +26,11 @@ var mods = presenter.elements; //short link
 
 //Test Window 
 var win1 = presenter.createModule('Window', Field, 'win1');
-win1.setSize(900, 500);
+win1.setSize(1050, 680);
 //var o1 = win1.appendElement('FieldElement');
 //var o2 = win1.appendElement('FieldElement');
 var gr = win1.appendElement('GraphVis');
-gr.setSize(800,450);
+gr.setSize(1000,620);
 //o1.connectTo(o2);
 
 //Creating manual connection

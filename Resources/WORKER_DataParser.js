@@ -1,57 +1,25 @@
 self.onmessage = function (e) {
-    /*
-        e.data = {
-            type: (stringXYZ | list_moda | byte),
-            data: (data)
+    var res = [];
+    var arrays = [];
+    files = e.data;
+    console.log(files);
+    for (var f in files) {
+        var arr = files[f];
+        arrays[f] = [];
+        var reader = new FileReaderSync();
+        console.log(arr)
+        var arr2 = new Uint8Array(arr);
+
+        for (var a = 0; a < arr2.length; a += 4) {
+            var b1 = arr2[a];
+            var b2 = arr2[a + 1] << 8;
+            var b3 = arr2[a + 2] << 16;
+            var b4 = arr2[a + 3] << 24;
+            if (typeof res[a / 4] === 'undefined') res[a / 4] = (b1 + b2 + b3 + b4);
+            res[a / 4] += (b1 + b2 + b3 + b4);
+            arrays[f].push((b1 + b2 + b3 + b4));
         }
-    */
-    var obj = {
-        x: [],
-        y: [],
-        z: []
-    };
-    var keys = ['x','y','z'];
-    var buffer = '';
-    var sum = 0;    
-    var index = 0;
-    console.log(e.data);
-    for (var d = 0; d < 100/*e.data.data[0].length*/; d++){
-        val = e.data.data[0][d];
-        buffer += val;   
-                                 
     }
-    console.log(val2);
-    console.log(obj);    
-    /*switch (e.data.type) {
-        case 'stringXYZ': {
-            var index = 0;
-            var val = '';
-            var buffer = '';
-            for (var f in e.data.data){                                
-                for (var s in e.data.data[f]) {                    
-                    val = e.data.data[s];
-                    if (val == ' '){
-                        index++;
-                        switch (index){
-                            case 1:{
-                                obj.x.push(parseFloat(buffer));
-                                break;
-                            }
-                            case 2:{
-                                obj.y.push(parseFloat(buffer));
-                                break;
-                            }
-                            case 3:{
-                                obj.z.push(parseFloat(buffer));
-                                index = 0; 
-                                break;
-                            }
-                        }
-                    }
-                    else buffer += val;                                                            
-                }                
-            }            
-            break;
-        }
-    }*/
+    
+    postMessage({arrays: arrays, sum: res});
 };

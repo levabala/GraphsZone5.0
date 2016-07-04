@@ -1,6 +1,7 @@
 function Presenter(name) {
     this._name = name;
     this.elements = {};
+    this.selected = {};
     this.availableModules = {
         //'FieldElement': FieldElement,
         'Window': Window,
@@ -38,6 +39,7 @@ function Presenter(name) {
             this.elements[module._id] = module;
         }
         counter++;
+        if (module._id) this.selected = module._id;        
         return module;
     };
 

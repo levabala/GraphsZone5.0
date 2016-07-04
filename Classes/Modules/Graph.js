@@ -7,7 +7,8 @@ function Graph(id, field, domId) {
     this.mb = document.createElement('moveButton');          
 
     this.blockDragging = function(){
-        graph.plot.onmousedown = function (event) {
+        graph.plot.onmousedown = function (event) {            
+            presenter.selected = graph._id;
             event.stopPropagation();
         };
     };

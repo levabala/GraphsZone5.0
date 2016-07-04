@@ -170,7 +170,7 @@ function FieldElement(id, parent, domId) {
         FileUploader.onerror = function(err){console.log(err);};
         FileUploader.postMessage({
             files: this.requiredFiles,
-            mode: 'String'
+            mode: 'ArrayBuffer'
         });                
     };
 
@@ -178,8 +178,7 @@ function FieldElement(id, parent, domId) {
 
     }; 
 
-    this.cacheFiles = function(e){        
-        
+    this.cacheFiles = function(e){                
         for (var f in e.data) fEl.cachedFiles[f] = e.data[f];
         FileUploader.removeEventListener('message', fEl.cacheFiles);
         fEl.afterUpload();
@@ -192,4 +191,10 @@ function FieldElement(id, parent, domId) {
     this.resizeEvent = function(){
 
     };
+
+    /*this.dom.onmousedown = function(e){
+        presenter.selected = fEl._id;
+        fEl.dom.style.border = 'solid darkgreen 3px';
+        e.stopPropagation();
+    };*/
 }
