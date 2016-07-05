@@ -19,11 +19,12 @@ function ModulesKeeper(id, field, domId) {
                 if (m == 'Maquette') continue;
                 var mod = this.newNormalMod(m);                
             }*/
-        var select = document.createElement('select');
+        var select = document.createElement('select');        
         select.onchange = function(e){
             var mod = mk.newNormalMod(m);            
             triggerMouseEvent(mod.dom,'mousedown');
             triggerMouseEvent(mod.dom,'mousemove');
+            select.value = 'Choose one';            
         };
         select.style.width = '90%';
         select.style.fontSize = '20px';
@@ -33,6 +34,7 @@ function ModulesKeeper(id, field, domId) {
                 opt.innerHTML = m;
                 select.appendChild(opt);
         }
+        select.value = 'Choose one';
         this.dom.appendChild(select);
     };
 

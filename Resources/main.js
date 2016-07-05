@@ -26,12 +26,14 @@ var mods = presenter.elements; //short link
 
 //Test Window 
 var win1 = presenter.createModule('Window', Field, 'win1');
-win1.setSize(1050, 680);
+//win1.setSize(1050, 680);
+win1.dom.style.width = '95%';
+win1.dom.style.height = '95%';
 //win1.dom.appendChild(createSwitcher());
 //var o1 = win1.appendElement('FieldElement');
 //var o2 = win1.appendElement('FieldElement');
 var gr = win1.appendElement('GraphVis');
-//gr.setSize(1000,620);
+gr.setSize(1200,620);
 //o1.connectTo(o2);
 
 //Creating manual connection

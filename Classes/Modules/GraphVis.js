@@ -238,6 +238,10 @@ function GraphVis(id, field, domId) {
             graph3d.redraw();
         };
 
+        /*setInterval(function () {            
+            graph3d.redraw();
+        }, 1000);*/
+
         perspectiveSwitch.onmousemove = function () {
             console.log('mousemove')
         };

@@ -9544,7 +9544,7 @@ return /******/ (function(modules) { // webpackBootstrap
    * @param {Event}  event   A mouse move event
    */
   Graph3d.prototype._onTooltip = function (event) {
-    var delay = 300; // ms
+    var delay = 100; // ms
     var boundingRect = this.frame.getBoundingClientRect();
     var mouseX = getMouseX(event) - boundingRect.left;
     var mouseY = getMouseY(event) - boundingRect.top;
@@ -9768,6 +9768,16 @@ return /******/ (function(modules) { // webpackBootstrap
       content.style.background = 'rgba(255,255,255,0.7)';
       content.style.borderRadius = '2px';
       content.style.boxShadow = '5px 5px 10px rgba(128,128,128,0.5)';
+
+      content.onmousedown = function(e){
+        e.preventDefault();
+      };
+      content.onmousemove = function(e){
+        e.preventDefault();
+      };
+      content.onmouseup = function(e){
+        e.preventDefault();
+      };
 
       line = document.createElement('div');
       line.style.position = 'absolute';
