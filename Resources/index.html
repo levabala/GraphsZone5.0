@@ -12,7 +12,9 @@
    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script><!--Подключаем библиотеку Jquery UI-->
    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js"></script> We use our modefied library-->   
    <!--Connecting external scripts-->
-   <script src='../Additional/VisjsOpen.js'></script>   
+   <script src='../Additional/VisjsOpen.js'></script>
+   <script src='../Additional/fileSaver.js'></script>
+   <script src='../Additional/domToImage.js'></script>   
    <script src='../Additional/Interact.js'></script>
    <script src='../Additional/jsPlumb.js'></script>
    <script src='../Additional/littleFuns.js'></script>         
@@ -48,7 +50,7 @@
             <div class='menuLine'>Menu line</div>
             <div class='menuLine'>Menu line</div>
          </div>
-         <div id='ModulesSection'>MODULES SECTION<button class='button' onclick="mKeeper.refreshModulesList()">Refresh</button></div>         
+         <div id='ModulesSection'>MODULES SECTION<!--<button class='button' onclick="mKeeper.refreshModulesList()">Refresh</button>--></div>         
      </div>
      <div id='ToggleButton'>
          <img id='ToggleImg' src="ToggleImage.png" width='50' height='45'>

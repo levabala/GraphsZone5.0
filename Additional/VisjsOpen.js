@@ -8985,6 +8985,42 @@ return /******/ (function(modules) { // webpackBootstrap
     return 'RGB(' + parseInt(R * 255) + ',' + parseInt(G * 255) + ',' + parseInt(B * 255) + ')';
   };
 
+
+  function rgb(r,g,b){
+      this.r = r;
+      this.g = g;
+      this.b = b;
+      this.toString = function(){
+          return 'RGB('+this.r+','+this.g+','+this.b+')';
+      }
+  }
+
+  function mixColors(c1,c2){
+      return new rgb(Math.floor((c1.r+c2.r)/2),Math.floor((c1.g+c2.g)/2),Math.floor((c1.b+c2.b)/2));
+  }
+
+  var palette = [
+          new rgb(0, 0, 153),
+          new rgb(57, 230, 0),
+          new rgb(255, 0, 0)
+      ];
+  var localP = [];
+  for (var a = 0; a < 10; a++){      
+      for (var b = 0; b < palette.length-1; b++){
+          localP.push(palette[b]);
+          localP.push(mixColors(palette[b],palette[b+1]));          
+      }
+      localP.push(palette[palette.length-1]);
+      palette = localP;
+      localP = [];
+  }
+  console.log(palette);
+  
+  Graph3d.prototype._z2grb = function(z, maxZ){            
+      var coeff = maxZ / palette.length;      
+      return palette[Math.floor(z/coeff)].toString();
+  };
+
   /**
    * Draw all datapoints as a grid
    * This function can be used when the style is 'grid'
@@ -9030,6 +9066,13 @@ return /******/ (function(modules) { // webpackBootstrap
     };
     this.dataPoints.sort(sortDepth);
 
+    this.maxZ = 0;
+    for (var ii = 0; ii < this.dataPoints.length; ii++){
+        var z = this.dataPoints[ii].point.z;
+        if (z > this.maxZ) this.maxZ = z;
+    }
+
+    
     if (this.style === Graph3d.STYLE.SURFACE) {
       for (i = 0; i < this.dataPoints.length; i++) {
         point = this.dataPoints[i];
@@ -9067,7 +9110,7 @@ return /******/ (function(modules) { // webpackBootstrap
               strokeStyle = fillStyle;
             } else {
               v = 1;
-              fillStyle = this._hsv2rgb(h, s, v);
+              fillStyle = this._z2grb(zAvg,this.maxZ);//this._hsv2rgb(h, s, v);              
               strokeStyle = this.axisColor; // TODO: should be customizable
             }
           } else {
