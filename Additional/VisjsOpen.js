@@ -8126,18 +8126,33 @@ return /******/ (function(modules) { // webpackBootstrap
         obj.screen = undefined;
         obj.bottom = new Point3d(x, y, this.zMin);
 
-        dataMatrix[xIndex][yIndex] = obj;
+        //dataMatrix[xIndex][yIndex] = obj;
+        dataMatrix[xIndex].push(obj);
 
         dataPoints.push(obj);
       }
 
       // fill in the pointers to the neighbors.
+      var c = 1;
+      console.log(dataMatrix)
       for (x = 0; x < dataMatrix.length; x++) {
         for (y = 0; y < dataMatrix[x].length; y++) {
           if (dataMatrix[x][y]) {
-            dataMatrix[x][y].pointRight = x < dataMatrix.length - 1 ? dataMatrix[x + 1][y] : undefined;
-            dataMatrix[x][y].pointTop = y < dataMatrix[x].length - 1 ? dataMatrix[x][y + 1] : undefined;
-            dataMatrix[x][y].pointCross = x < dataMatrix.length - 1 && y < dataMatrix[x].length - 1 ? dataMatrix[x + 1][y + 1] : undefined;
+            if (x < dataMatrix.length-1) dataMatrix[x][y].pointRight = x < dataMatrix.length - 1 ? dataMatrix[x + 1][y] : undefined;
+            else {
+              while(x < dataMatrix.length-c && dataMatrix[x+c][y] !== undefined) {c++;};
+              dataMatrix[x][y].pointRight = x < dataMatrix.length - c ? dataMatrix[x + c][y] : undefined;
+              c = 1;
+            }            
+            if (y < dataMatrix[x].length-1 && dataMatrix[x][y + 1] !== undefined) dataMatrix[x][y].pointTop = y < dataMatrix[x].length - 1 ? dataMatrix[x][y + 1] : undefined;
+            else {              
+              while(y < dataMatrix[x].length-c && dataMatrix[x][y+c] === undefined) {c++;/*console.log(dataMatrix[x][y+c] ? dataMatrix[x][y+c].point : 'NaN')*/};              
+              dataMatrix[x][y].pointTop = x < dataMatrix[x].length - c ? dataMatrix[x][y + c] : undefined;              
+              c = 1;              
+              dataMatrix[x][y].pointTop ? console.info('Succes',c) : console.warn('Fail',c);              
+            }
+            if (dataMatrix[x + 1] && dataMatrix[x + 1][y + 1] !== undefined) dataMatrix[x][y].pointCross = x < dataMatrix.length - 1 && y < dataMatrix[x].length - 1 ? dataMatrix[x + 1][y + 1] : undefined;
+            //else console.warn('Z exception')
           }
         }
       }
@@ -8437,6 +8452,9 @@ return /******/ (function(modules) { // webpackBootstrap
       if (options.valueMax !== undefined) this.defaultValueMax = options.valueMax;
       if (options.bottomColor !== undefined) this.bottomColor = options.bottomColor;
       if (options.backgroundColor !== undefined) this._setBackgroundColor(options.backgroundColor);
+      if (options.scaleX !== undefined) this.scaleX = options.scaleX;
+      if (options.scaleY !== undefined) this.scaleY = options.scaleY;
+      if (options.scaleZ !== undefined) this.scaleZ = options.scaleZ;
 
       if (options.cameraPosition !== undefined) cameraPosition = options.cameraPosition;
 
@@ -9812,7 +9830,7 @@ return /******/ (function(modules) { // webpackBootstrap
     if (typeof this.showTooltip === 'function') {
       content.innerHTML = this.showTooltip(dataPoint.point);
     } else {
-      content.innerHTML = '<table>' + '<tr><td>' + this.xLabel + ':</td><td>' + dataPoint.point.x + '</td></tr>' + '<tr><td>' + this.yLabel + ':</td><td>' + dataPoint.point.y + '</td></tr>' + '<tr><td>' + this.zLabel + ':</td><td>' + dataPoint.point.z + '</td></tr>' + '</table>';
+      content.innerHTML = '<table>' + '<tr><td>' + this.xLabel + ':</td><td>' + parseFloat(dataPoint.point.x.toFixed(1))/(this.scaleX || 1) + '</td></tr>' + '<tr><td>' + this.yLabel + ':</td><td>' + parseFloat(dataPoint.point.y.toFixed(1))/(this.scaleY || 1) + '</td></tr>' + '<tr><td>' + this.zLabel + ':</td><td>' + parseFloat(dataPoint.point.z.toFixed(1))/(this.scaleZ || 1) + '</td></tr>' + '</table>';
     }
 
     content.style.left = '0';

@@ -2,11 +2,12 @@ self.onmessage = function (e) {
     var res = [];
     //data.add({ id: counter++, x: x, y: y, z: value, style: value });
 
-    var arrays = e.data;
+    var arrays = e.data.arrays;
+    var roughness = e.data.roughness;
     var points = [];
     var index = 0;
     var normalWidth = 400;
-    var coeffX = normalWidth / arrays.length;
+    var coeffX = Math.floor(normalWidth / arrays.length);
     
     var lastZ = 0;
     var lastY = 0;
@@ -16,13 +17,14 @@ self.onmessage = function (e) {
     var maxZ = 0;
     for (var x in arrays){
         for (var y in arrays[x]) {
-            if (y > bottomB && y < topB){// && Math.abs(arrays[x][y]-lastZ) > 10) {
+            if (y > bottomB && y < topB && Math.abs(arrays[x][y]-lastZ) > roughness) {
                 points.push({ id: index, x: parseInt(x) * coeffX, y: parseInt(y), z: arrays[x][y]});
                 lastZ = arrays[x][y];
                 if (lastZ > maxZ) maxZ = lastZ;               
                 //lastY = y;
-            }
-            index++;
+                index++;
+            }   
+                     
         }
         maxX = x*coeffX;            
     }    

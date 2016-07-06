@@ -7,6 +7,8 @@ function GraphVis(id, field, domId) {
     var axXmax = 0;
     var axYmax = 0;
     var axZmax = 0;
+    var roughness = 0;    
+    var lastCache = [];
     Graph.apply(this, arguments);
 
     this.setSize(600, 400);
@@ -14,9 +16,9 @@ function GraphVis(id, field, domId) {
     this.afterUpload = function () {
         console.clear();
         DataParser.postMessage(this.cachedFiles);
-        DataParser.onmessage = function (e) {
-            console.log(grv.cachedFiles)
-            DataFormater.postMessage(e.data.arrays);
+        DataParser.onmessage = function (e) {   
+            console.log(roughness)    
+            DataFormater.postMessage({arrays: e.data.arrays, roughness: roughness});
             DataFormater.onmessage = function (ee) {
                 axXmax = ee.data.maxX;
                 axYmax = ee.data.maxY;
@@ -27,6 +29,7 @@ function GraphVis(id, field, domId) {
                 grv.buildGraph(null, data, null);
             };
         };
+        lastCache = this.cachedFiles;
         this.cachedFiles = [];
     };
 
@@ -75,15 +78,23 @@ function GraphVis(id, field, domId) {
             if (!axisesSize) axisesSize = {};
             data = new vis.DataSet();
             var counter = 0;
-            var steps = (pointsNumber || 50);  // number of datapoints will be steps*steps
+            var steps = 5;//(pointsNumber || 5);  // number of datapoints will be steps*steps
             var axisMaxX = (axisesSize.x || 200);
-            var axisMaxY = (axisesSize.y || 200);
+            var axisMaxY = (axisesSize.y || 100);
             var axisStepX = axisMaxX / steps;
             var axisStepY = axisMaxY / steps;
             for (var x = 0; x < axisMaxX; x += axisStepX) {
+                console.log('c:',counter)
+                console.log('x:',x)
+                if (x == axisStepX*2) continue;
                 for (var y = 0; y < axisMaxY; y += axisStepY) {
+                    if (y == axisStepY*3) {
+                        console.warn('S N A P')
+                        continue;
+                    }
                     var value = (Math.sin(x / 50) * Math.cos(y / 50) * 50 + 50);
                     data.add({ id: counter++, x: x, y: y, z: value, style: value });
+                    console.log({x:x,y:y});
                 }
             }
         }
@@ -109,9 +120,10 @@ function GraphVis(id, field, domId) {
                     return (x / coeffX).toFixed(1);
                 },
                 legendLabel: 'label',
-                xLabel: 'Number',
-                yLabel: 'Channel',
-                zLabel: 'Value',
+                xLabel: 'Number(x)',
+                scaleX: coeffX,
+                yLabel: 'Channel(y)',
+                zLabel: 'Value(z)',
                 bottomColor: 240,
                 verticalRatio: 0.5
             };
@@ -122,12 +134,13 @@ function GraphVis(id, field, domId) {
         var graph3d = new vis.Graph3d(container, data, options);
         var graphDom = this.dom.firstChild;
 
-        console.log(camera)
+        if (!camera.distance)
         graph3d.setCameraPosition({
             horizontal: 5.1,//1.5697963267948967,
             vertical: 1.5707963267948966,
             distance: 1.7
         });
+        else graph3d.setCameraPosition(camera);
 
 
         graphDom.firstChild.addEventListener('mousedown', function (e) {
@@ -152,7 +165,7 @@ function GraphVis(id, field, domId) {
                         graph3d.setData(data);
                     }
                     else {
-                        grv.buildGraph({ x: 200, y: 100 }, null, 10);
+                        grv.buildGraph(null, null, null);
                     }
                     graphDom.firstChild.onmouseup = null;
                 };
@@ -216,26 +229,30 @@ function GraphVis(id, field, domId) {
 
         $(document).ready(function () {
             $(span).slider({
-                value: 240,//Значение, которое будет выставлено слайдеру при загрузке
+                value: roughness,//Значение, которое будет выставлено слайдеру при загрузке
                 min: 0,//Минимально возможное значение на ползунке
-                max: 360,//Максимально возможное значение на ползунке
+                max: 100,//Максимально возможное значение на ползунке
                 step: 1,//Шаг, с которым будет двигаться ползунок
                 create: function (event, ui) {
-                    bottomColor = $(span).slider("value");//При создании слайдера, получаем его значение в перемен. val                
+                    roughness = $(span).slider("value");//При создании слайдера, получаем его значение в перемен. val                
                 },
                 slide: function (event, ui) {
-                    bottomColor = ui.value;
+                    roughness = ui.value;                    
                 }
             });
         });
 
         span.onmouseup = function () {
-            graph3d.setOptions({ bottomColor: bottomColor });
+            /*graph3d.setOptions({ bottomColor: bottomColor });
             options.bottomColor = bottomColor;
             graph3d.setSize(grv.dom.width, grv.dom.height);
             graphDom.style.width = grv.dom.width + 'px';
             graphDom.style.height = grv.dom.height + 'px';
-            graph3d.redraw();
+            graph3d.redraw();*/
+            camera = graph3d.getCameraPosition();
+            if (lastCache.length == 0) return;
+            grv.cachedFiles = lastCache;
+            grv.afterUpload();
         };
 
         /*setInterval(function () {            
