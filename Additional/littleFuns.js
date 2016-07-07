@@ -140,3 +140,13 @@ function triggerMouseEvent (node, eventType) {
     clickEvent.initEvent (eventType, true, true);
     node.dispatchEvent (clickEvent);
 }
+
+function rgb(r,g,b,top){
+      this.r = r;
+      this.g = g;
+      this.b = b;
+      this.top = top;
+      this.toString = function(){
+          return 'RGB('+this.r+','+this.g+','+this.b+')';
+      }
+  }

@@ -1,24 +1,27 @@
 function GraphVis(id, field, domId) {
     var grv = this;
     var coeffX = 1;
+    var quality = 10;
     var maindata;
     var camera = {};
     var opts = {};
     var axXmax = 0;
     var axYmax = 0;
     var axZmax = 0;
-    var roughness = 0;    
+    var roughness = 0;
     var lastCache = [];
+    var palette = [];
     Graph.apply(this, arguments);
 
     this.setSize(600, 400);
 
     this.afterUpload = function () {
-        console.clear();
+        //console.clear();
+        loadstart();
         DataParser.postMessage(this.cachedFiles);
-        DataParser.onmessage = function (e) {   
-            console.log(roughness)    
-            DataFormater.postMessage({arrays: e.data.arrays, roughness: roughness});
+        DataParser.onmessage = function (e) {
+            console.log(roughness)
+            DataFormater.postMessage({ arrays: e.data.arrays, roughness: roughness, quality: quality });
             DataFormater.onmessage = function (ee) {
                 axXmax = ee.data.maxX;
                 axYmax = ee.data.maxY;
@@ -27,6 +30,7 @@ function GraphVis(id, field, domId) {
                 for (var v in ee.data.points) data.add(ee.data.points[v]);
                 coeffX = ee.data.coeffX;
                 grv.buildGraph(null, data, null);
+                loadend();
             };
         };
         lastCache = this.cachedFiles;
@@ -52,25 +56,52 @@ function GraphVis(id, field, domId) {
         span.firstChild.blur();
     };
 
+    //C O L O R  P I C K E R    
+    var cp = document.createElement('div');
+    cp.className = 'colorpicker';
+    cp.innerHTML = 'Color Picker';
+
+    cp.ondragleave = function (event) {
+        cp.style.background = 'lightcoral';
+
+        event.stopPropagation();
+        event.preventDefault();
+    };
+
+    cp.ondragover = function (event) {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'copy';
+    };
+
+    cp.ondragenter = function (event) {
+        cp.style.background = '#e6ffe6';
+        event.stopPropagation();
+        event.preventDefault();
+    };
+
+    function loadstart() {
+        cp.innerHTML = 'Loading...';
+    }
+
+    function loadend() {
+        cp.innerHTML = 'Color Picker';
+    }
+
     var perspectiveSwitch = createSwitcher();
     var pespOn = false;
 
     toolBox.appendChild(snapshotBut);
     toolBox.appendChild(perspectiveSwitch);
+    toolBox.appendChild(cp);
     //toolBox.appendChild(secondBut);
     //toolBox.appendChild(thirdBut);
 
-    toolBox.appendChild(document.createElement('br'));
-    toolBox.appendChild(document.createElement('br'));
+    //toolBox.appendChild(document.createElement('br'));
+    //toolBox.appendChild(document.createElement('br'));
     //toolBox.appendChild(document.createElement('br'));
     toolBox.appendChild(span);
 
     var bottomColor;
-
-    span.onmousedown = function (e) {
-        console.log('span1');
-        e.stopPropagation();
-    };
 
     this.buildGraph = function (axisesSize, d, pointsNumber, maquette) {
         var data;
@@ -84,17 +115,17 @@ function GraphVis(id, field, domId) {
             var axisStepX = axisMaxX / steps;
             var axisStepY = axisMaxY / steps;
             for (var x = 0; x < axisMaxX; x += axisStepX) {
-                console.log('c:',counter)
-                console.log('x:',x)
-                if (x == axisStepX*2) continue;
+                //console.log('c:', counter)
+                //console.log('x:', x)
+                if (x == axisStepX * 2) continue;
                 for (var y = 0; y < axisMaxY; y += axisStepY) {
-                    if (y == axisStepY*3) {
-                        console.warn('S N A P')
+                    if (y == axisStepY * 3) {
+                        //console.warn('S N A P')
                         continue;
                     }
                     var value = (Math.sin(x / 50) * Math.cos(y / 50) * 50 + 50);
                     data.add({ id: counter++, x: x, y: y, z: value, style: value });
-                    console.log({x:x,y:y});
+                    //console.log({ x: x, y: y });
                 }
             }
         }
@@ -116,8 +147,12 @@ function GraphVis(id, field, domId) {
                     strokeWidth: 0.001
                 },
                 xCenter: '50%',
+                yCenter: '50%',
+                yValueLabel: function (y) {
+                    return Math.floor(y)//(y-3)/227.39);
+                },
                 xValueLabel: function (x) {
-                    return (x / coeffX).toFixed(1);
+                    return Math.floor(15 + 2.25*x);
                 },
                 legendLabel: 'label',
                 xLabel: 'Number(x)',
@@ -125,9 +160,11 @@ function GraphVis(id, field, domId) {
                 yLabel: 'Channel(y)',
                 zLabel: 'Value(z)',
                 bottomColor: 240,
-                verticalRatio: 0.5
+                verticalRatio: 0.5,
+                palette: (palette.length > 0 ? palette : undefined)
             };
-        else options = opts;
+        else options = opts;        
+        console.log('VERTICAL RATION:',options.verticalRatio)
 
         // Instantiate our graph object.
         var container = this.dom;
@@ -135,11 +172,11 @@ function GraphVis(id, field, domId) {
         var graphDom = this.dom.firstChild;
 
         if (!camera.distance)
-        graph3d.setCameraPosition({
-            horizontal: 5.1,//1.5697963267948967,
-            vertical: 1.5707963267948966,
-            distance: 1.7
-        });
+            graph3d.setCameraPosition({
+                horizontal: 5.1,//1.5697963267948967,
+                vertical: 1.5707963267948966,
+                distance: 1.7
+            });
         else graph3d.setCameraPosition(camera);
 
 
@@ -167,7 +204,7 @@ function GraphVis(id, field, domId) {
                     else {
                         grv.buildGraph(null, null, null);
                     }
-                    graphDom.firstChild.onmouseup = null;
+                    document.onmouseup = null;
                 };
             }
         });
@@ -208,16 +245,30 @@ function GraphVis(id, field, domId) {
                 }
                 case 38: {
                     //top
-                    val = options.verticalRatio + 0.05;
-                    graph3d.setOptions({ verticalRatio: val });
-                    options.verticalRatio = val;
+                    if (e.ctrlKey) {
+                        val = options.verticalRatio + 0.05;
+                        graph3d.setOptions({ verticalRatio: val });
+                        options.verticalRatio = val;
+                    }
+                    else {
+                        val = parseInt(options.yCenter.replace('%')) + 1 + '%';
+                        graph3d.setOptions({ yCenter: val });
+                        options.yCenter = val;
+                    }
                     break;
                 }
                 case 40: {
                     //bottom
-                    val = options.verticalRatio - 0.05;
-                    graph3d.setOptions({ verticalRatio: val });
-                    options.verticalRatio = val;
+                    if (e.ctrlKey) {
+                        val = options.verticalRatio - 0.05;
+                        graph3d.setOptions({ verticalRatio: val });
+                        options.verticalRatio = val;
+                    }
+                    else {
+                        val = parseInt(options.yCenter.replace('%')) - 1 + '%';
+                        graph3d.setOptions({ yCenter: val });
+                        options.yCenter = val;
+                    }
                     break;
                 }
             }
@@ -229,31 +280,81 @@ function GraphVis(id, field, domId) {
 
         $(document).ready(function () {
             $(span).slider({
-                value: roughness,//Значение, которое будет выставлено слайдеру при загрузке
+                value: quality,//Значение, которое будет выставлено слайдеру при загрузке
                 min: 0,//Минимально возможное значение на ползунке
-                max: 100,//Максимально возможное значение на ползунке
+                max: 10,//Максимально возможное значение на ползунке
                 step: 1,//Шаг, с которым будет двигаться ползунок
                 create: function (event, ui) {
-                    roughness = $(span).slider("value");//При создании слайдера, получаем его значение в перемен. val                
+                    quality = $(span).slider("value");//При создании слайдера, получаем его значение в перемен. val                
                 },
                 slide: function (event, ui) {
-                    roughness = ui.value;                    
+                    quality = ui.value;
                 }
             });
         });
 
-        span.onmouseup = function () {
-            /*graph3d.setOptions({ bottomColor: bottomColor });
-            options.bottomColor = bottomColor;
-            graph3d.setSize(grv.dom.width, grv.dom.height);
-            graphDom.style.width = grv.dom.width + 'px';
-            graphDom.style.height = grv.dom.height + 'px';
-            graph3d.redraw();*/
+        cp.ondrop = function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            cp.style.background = 'lightcoral';
+
+            // Check for the various File API support.
+            if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
+                alert('The File APIs are not fully supported in this browser.');
+                return;
+            }
+
+            console.log(event);
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                console.log(e.target.result);
+                var txt = e.target.result.split('\n');
+                var pal = [];
+                for (var t = 1; t < txt.length; t++) {
+                    var arr = txt[t].split(' ');
+                    if (arr.length < 3) continue;
+                    pal[t - 1] = [];
+                    var val = [];
+                    for (var a in arr) {
+                        var b = arr[a];
+                        if (isNaN(parseFloat(b))) continue;
+                        val.push(parseFloat(b));
+                    }
+                    pal[t - 1] = new rgb(val[1], val[2], val[3], val[0] / 100);
+                }
+                var p = [];
+                palette = pal;
+                console.log(palette)
+                /*camera = graph3d.getCameraPosition();
+                console.log(lastCache.length)
+                if (lastCache.length === 0) return;
+                grv.cachedFiles = lastCache;
+                grv.afterUpload();*/
+                graph3d.setOptions({ palette: palette });
+                graph3d.setSize(grv.dom.width, grv.dom.height);
+                graphDom.style.width = grv.dom.width + 'px';
+                graphDom.style.height = grv.dom.height + 'px';
+                graph3d.redraw(true);
+            };
+            console.log(event)
+            var txt = reader.readAsText(event.dataTransfer.files[0]);
+        };
+
+
+        span.onmousedown = function (e) {
+            console.log('span1');
+            e.stopPropagation();
+            opts = options;
+            document.onmouseup = rebuild;
+        };
+
+        function rebuild() {
             camera = graph3d.getCameraPosition();
-            if (lastCache.length == 0) return;
+            if (lastCache.length === 0) return;
             grv.cachedFiles = lastCache;
             grv.afterUpload();
-        };
+            document.onmouseup = null;
+        }
 
         /*setInterval(function () {            
             graph3d.redraw();

@@ -8134,8 +8134,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
       // fill in the pointers to the neighbors.
       var c = 1;
-      console.log(dataMatrix)
+      //console.log(dataMatrix)
       for (x = 0; x < dataMatrix.length; x++) {
+        for (y = 0; y < dataMatrix[x].length; y++) {
+          if (dataMatrix[x][y]) {
+            dataMatrix[x][y].pointRight = x < dataMatrix.length - 1 ? dataMatrix[x + 1][y] : undefined;                        
+            dataMatrix[x][y].pointTop = y < dataMatrix[x].length - 1 ? dataMatrix[x][y + 1] : undefined;            
+            dataMatrix[x][y].pointCross = x < dataMatrix.length - 1 && y < dataMatrix[x].length - 1 ? dataMatrix[x + 1][y + 1] : undefined;            
+          }
+        }
+      }
+      /*for (x = 0; x < dataMatrix.length; x++) {
         for (y = 0; y < dataMatrix[x].length; y++) {
           if (dataMatrix[x][y]) {
             if (x < dataMatrix.length-1) dataMatrix[x][y].pointRight = x < dataMatrix.length - 1 ? dataMatrix[x + 1][y] : undefined;
@@ -8146,16 +8155,16 @@ return /******/ (function(modules) { // webpackBootstrap
             }            
             if (y < dataMatrix[x].length-1 && dataMatrix[x][y + 1] !== undefined) dataMatrix[x][y].pointTop = y < dataMatrix[x].length - 1 ? dataMatrix[x][y + 1] : undefined;
             else {              
-              while(y < dataMatrix[x].length-c && dataMatrix[x][y+c] === undefined) {c++;/*console.log(dataMatrix[x][y+c] ? dataMatrix[x][y+c].point : 'NaN')*/};              
+              while(y < dataMatrix[x].length-c && dataMatrix[x][y+c] === undefined) {c++;};              
               dataMatrix[x][y].pointTop = x < dataMatrix[x].length - c ? dataMatrix[x][y + c] : undefined;              
               c = 1;              
-              dataMatrix[x][y].pointTop ? console.info('Succes',c) : console.warn('Fail',c);              
+              //dataMatrix[x][y].pointTop ? console.info('Succes',c) : console.warn('Fail',c);              
             }
             if (dataMatrix[x + 1] && dataMatrix[x + 1][y + 1] !== undefined) dataMatrix[x][y].pointCross = x < dataMatrix.length - 1 && y < dataMatrix[x].length - 1 ? dataMatrix[x + 1][y + 1] : undefined;
             //else console.warn('Z exception')
           }
         }
-      }
+      }*/
     } else {
       // 'dot', 'dot-line', etc.
       // copy all values from the google data table to a list with Point3d objects
@@ -8455,6 +8464,7 @@ return /******/ (function(modules) { // webpackBootstrap
       if (options.scaleX !== undefined) this.scaleX = options.scaleX;
       if (options.scaleY !== undefined) this.scaleY = options.scaleY;
       if (options.scaleZ !== undefined) this.scaleZ = options.scaleZ;
+      if (options.palette !== undefined) this.paletteExt = options.palette;
 
       if (options.cameraPosition !== undefined) cameraPosition = options.cameraPosition;
 
@@ -8500,7 +8510,8 @@ return /******/ (function(modules) { // webpackBootstrap
   /**
    * Redraw the Graph.
    */
-  Graph3d.prototype.redraw = function () {
+  var count = 0;
+  Graph3d.prototype.redraw = function (newPalette) {
     if (this.dataPoints === undefined) {
       throw 'Error: graph data not initialized';
     }
@@ -8509,7 +8520,10 @@ return /******/ (function(modules) { // webpackBootstrap
     this._resizeCenter();
     this._redrawSlider();
     this._redrawClear();
+    if (newPalette || count == 0) this._updatePalette();
     this._redrawAxis();
+
+    //console.warn('All redrawed',this.palette)
 
     if (this.style === Graph3d.STYLE.GRID || this.style === Graph3d.STYLE.SURFACE) {
       this._redrawDataGrid();
@@ -8524,6 +8538,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
     this._redrawInfo();
     this._redrawLegend();
+    count++;
   };
 
   /**
@@ -9004,39 +9019,56 @@ return /******/ (function(modules) { // webpackBootstrap
   };
 
 
-  function rgb(r,g,b){
+  function rgb(r,g,b,top){
       this.r = r;
       this.g = g;
       this.b = b;
+      this.top = top;
       this.toString = function(){
           return 'RGB('+this.r+','+this.g+','+this.b+')';
       }
   }
 
   function mixColors(c1,c2){
-      return new rgb(Math.floor((c1.r+c2.r)/2),Math.floor((c1.g+c2.g)/2),Math.floor((c1.b+c2.b)/2));
+      return new rgb(Math.floor((c1.r+c2.r)/2),Math.floor((c1.g+c2.g)/2),Math.floor((c1.b+c2.b)/2),(c1.top+c2.top)/2);
   }
 
-  var palette = [
-          new rgb(0, 0, 153),
-          new rgb(57, 230, 0),
-          new rgb(255, 0, 0)
-      ];
-  var localP = [];
-  for (var a = 0; a < 10; a++){      
-      for (var b = 0; b < palette.length-1; b++){
-          localP.push(palette[b]);
-          localP.push(mixColors(palette[b],palette[b+1]));          
-      }
-      localP.push(palette[palette.length-1]);
-      palette = localP;
-      localP = [];
-  }
-  console.log(palette);
+  var palette;
+  Graph3d.prototype._updatePalette = function(){
+    console.log('first palette:',this.palette)
+    if (this.paletteExt === undefined)
+      this.palette = [            
+              new rgb(0, 0, 153, 0),
+              new rgb(57, 230, 0, 0.5),
+              new rgb(255, 0, 0, 1)
+          ];
+    else this.palette = this.paletteExt;
+    console.log('palExt:',this.paletteExt)
+    var localP = [];  
+    for (var a = 0; a < 2; a++){      
+        for (var b = 0; b < this.palette.length-1; b++){
+            localP.push(this.palette[b]);
+            localP.push(mixColors(this.palette[b],this.palette[b+1]));                      
+        }
+        localP.push(this.palette[this.palette.length-1]);
+        this.palette = localP;
+        localP = [];
+    }
+    palette = this.palette;
+    console.log(this.palette);
+  }  
   
-  Graph3d.prototype._z2grb = function(z, maxZ){            
-      var coeff = maxZ / palette.length;      
-      return palette[Math.floor(z/coeff)].toString();
+  Graph3d.prototype._z2grb = function(z, maxZ, minZ){      
+      var coeff = z/maxZ//-z/minZ;      
+      //console.info(coeff,maxZ,minZ,z)
+      for (var p = 0; p < palette.length-1; p++){   
+        //console.log(coeff,palette[p+1].top)
+        //console.log(coeff > palette[p].top, coeff < palette[p+1].top)             
+        if (coeff > palette[p].top && coeff < palette[p+1].top){
+            //console.info(palette[p]);
+            return palette[p].toString();
+        }
+      }           
   };
 
   /**
@@ -9085,9 +9117,11 @@ return /******/ (function(modules) { // webpackBootstrap
     this.dataPoints.sort(sortDepth);
 
     this.maxZ = 0;
+    this.minZ = this.dataPoints[0].point.z;
     for (var ii = 0; ii < this.dataPoints.length; ii++){
         var z = this.dataPoints[ii].point.z;
         if (z > this.maxZ) this.maxZ = z;
+        if (z < this.minZ) this.minZ = z;
     }
 
     
@@ -9128,7 +9162,7 @@ return /******/ (function(modules) { // webpackBootstrap
               strokeStyle = fillStyle;
             } else {
               v = 1;
-              fillStyle = this._z2grb(zAvg,this.maxZ);//this._hsv2rgb(h, s, v);              
+              fillStyle = this._z2grb(zAvg,this.maxZ,this.minZ);//this._hsv2rgb(h, s, v);              
               strokeStyle = this.axisColor; // TODO: should be customizable
             }
           } else {
@@ -9786,6 +9820,19 @@ return /******/ (function(modules) { // webpackBootstrap
       content.style.background = 'rgba(255,255,255,0.7)';
       content.style.borderRadius = '2px';
       content.style.boxShadow = '5px 5px 10px rgba(128,128,128,0.5)';
+      content.style.webkitTouchCallout = 'none';
+      content.style.webkitUserSelect = 'none';
+      content.style.khtmlUserSelect = 'none';
+      content.style.mozUserSelect = 'none';
+      content.style.oUserSelect = 'none';
+      content.style.userSelect = 'none';
+      /*-webkit-touch-callout: none;
+    -webkit-user-select: none;
+     -khtml-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+         -o-user-select: none;
+            user-select: none;*/
 
       content.onmousedown = function(e){
         e.preventDefault();
